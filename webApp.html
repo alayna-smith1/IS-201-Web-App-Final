@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Provo Amazing Race Creator</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f7f7f7;
+        color: #333;
+        margin:0; padding:0;
+    }
+    header {
+        background: #00539C;
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+    .container {
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+    }
+    h2 { color: #00539C; }
+    .locations {
+        columns: 2;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+    .locations label {
+        display: block;
+        margin: 6px 0;
+    }
+    button {
+        background: #00539C;
+        color: white;
+        border: none;
+        padding: 12px 18px;
+        margin: 6px;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+    button:hover {
+        background: #003d73;
+    }
+    .output {
+        margin-top: 30px;
+        background: white;
+        padding: 15px;
+        border-radius: 6px;
+        box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    }
+    .riddle-box {
+        margin-bottom: 18px;
+    }
+    .riddle-box textarea {
+        width: 100%;
+        padding:8px;
+        font-size: 14px;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Provo Amazing Race Creator</h1>
+    <p>Select 3–5 locations and generate unique race paths with riddles</p>
+</header>
+
+<div class="container">
+
+    <h2>1. Choose Locations</h2>
+    <div class="locations">
+        <!-- Sample Provo Locations -->
+        <label><input type="checkbox" value="Rock Canyon Trailhead"> Rock Canyon Trailhead</label>
+        <label><input type="checkbox" value="Provo River Parkway"> Provo River Parkway</label>
+        <label><input type="checkbox" value="BYU Campus"><strong>BYU Campus</strong></label>
+        <label><input type="checkbox" value="Kiwanis Park"> Kiwanis Park</label>
+        <label><input type="checkbox" value="Pickleball Courts - Provo Rec"> Pickleball Courts - Provo Rec</label>
+        <label><input type="checkbox" value="Y Trail Parking Lot"> Y Trail Parking Lot</label>
+        <label><input type="checkbox" value="Provo City Center Temple"> Provo City Center Temple</label>
+        <label><input type="checkbox" value="Vivint Smart Home Arena"> Vivint Smart Home Arena</label>
+    </div>
+
+    <button onclick="generateRace()">Generate Amazing Race</button>
+    <button onclick="printRiddles()">Print Riddles</button>
+
+    <div class="output" id="output"></div>
+</div>
+
+
+<script>
+// utility functions
+function shuffle(arr) {
+    return arr.sort(() => Math.random() - 0.5);
+}
+
+function generateRiddle(from, to) {
+    const hints = [
+        `Where history meets hustle, then stride to`,
+        `Head next to`,
+        `Make your way to`,
+        `Keep your eyes peeled for`,
+        `Follow the clues to`,
+        `The next stop lies at`
+    ];
+    const hint = hints[Math.floor(Math.random() * hints.length)];
+    return `${hint} ${to}!`;
+}
+
+function generateRace() {
+    let checks = [...document.querySelectorAll('.locations input:checked')].map(c => c.value);
+
+    if (checks.length < 3 || checks.length > 5) {
+        alert("Please select *3–5* locations!");
+        return;
+    }
+
+    // shuffle for randomness
+    const selection = shuffle(checks);
+
+    // divide into 2 paths
+    const teamA = selection.slice(0, Math.ceil(selection.length/2));
+    const teamB = selection.slice(Math.ceil(selection.length/2));
+
+    // generate riddles
+    function makePath(path) {
+        let content = "";
+        for (let i = 0; i < path.length - 1; i++) {
+            content += `<div class="riddle-box">
+                <strong>${path[i]} ➜ ${path[i+1]}</strong>
+                <textarea>${generateRiddle(path[i], path[i+1])}</textarea>
+            </div>`;
+        }
+        return content;
+    }
+
+    const html = `
+        <h2>Team A</h2>${makePath(teamA)}
+        <h2>Team B</h2>${makePath(teamB)}
+    `;
+
+    document.getElementById("output").innerHTML = html;
+}
+
+function printRiddles() {
+    window.print();
+}
+
+</script>
+
+</body>
+</html>
